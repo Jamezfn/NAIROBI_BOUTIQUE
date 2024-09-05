@@ -1,0 +1,1 @@
+Nairobi Boutique Hub is an online platform that showcases boutiques around Nairobi. Boutique owners can create accounts to add their shops, and customers can browse and purchase items. The user interface is inspired by the Netflix homepage, displaying shops instead of movies. Users can create accounts, explore shops, add items to a bucket list, and make purchases.

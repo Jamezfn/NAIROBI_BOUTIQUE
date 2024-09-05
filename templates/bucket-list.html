@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bucket List - Nairobi Boutique Hub</title>
+    <link rel="stylesheet" href="static/css/main.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav>
+        <div class="logo">
+            <h1>Nairobi Boutique Hub</h1>
+        </div>
+        <div class="auth-links">
+            <a href="/profile">My Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Bucket List Header -->
+    <header class="bucket-list-header">
+        <h2>My Bucket List</h2>
+        <p>These are the items you've added to your bucket list.</p>
+    </header>
+
+    <!-- Bucket List Items Section -->
+    <div class="container">
+        <div class="bucket-list-grid">
+            <!-- Repeat this block for each item in the bucket list -->
+            <div class="bucket-list-item">
+                <img src="static/images/item1.jpg" alt="Item 1">
+                <div class="item-info">
+                    <h4>Trousers</h4>
+                    <p>Price: $50</p>
+                    <button class="remove-from-bucket">Remove</button>
+                </div>
+            </div>
+            <div class="bucket-list-item">
+                <img src="static/images/item2.jpg" alt="Item 2">
+                <div class="item-info">
+                    <h4>Shirts</h4>
+                    <p>Price: $30</p>
+                    <button class="remove-from-bucket">Remove</button>
+                </div>
+            </div>
+            <!-- Add more bucket list items here -->
+        </div>
+    </div>
+
+    <!-- Checkout Section -->
+    <div class="checkout">
+        <button class="checkout-button">Proceed to Checkout</button>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Nairobi Boutique Hub</p>
+    </footer>
+
+    <script src="static/js/app.js"></script>
+</body>
+</html>
