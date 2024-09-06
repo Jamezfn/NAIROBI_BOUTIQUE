@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
-from .user import db, User
+from models.user import db, User
 
 boutiques_bp = Blueprint('boutiques', __name__)
 
@@ -22,8 +22,6 @@ class Boutique(db.Model):
             'owner': self.owner.username
         }
 
-with app.app_context():
-    db.create_all()
 
 @boutiques_bp.route('/create', methods=['POST'])
 @login_required

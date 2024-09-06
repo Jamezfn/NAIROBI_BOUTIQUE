@@ -1,10 +1,11 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from .auth import auth_bp
-from .boutiques import boutiques_bp
-from .bucketlist import bucketlist_bp
-from .user import db, User
+from flask_migrate import Migrate
+from routes.auth import auth_bp
+from routes.boutiques import boutiques_bp
+from routes.bucketlist import bucketlist_bp
+from models.user import db, User
 
 app = Flask(__name__)
 
@@ -13,6 +14,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+migrate = Migrate(app, db)
 
 login_manager = LoginManager()
 login_manager.init_app(app)

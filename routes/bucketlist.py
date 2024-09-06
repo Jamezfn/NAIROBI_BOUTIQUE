@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_login import login_required, current_user
-from .user import db, User
-from .items import Item
+from models.user import db, User
+from models.item import Item
 
 bucketlist_bp = Blueprint('bucketlist', __name__)
 
@@ -21,10 +21,6 @@ class BucketList(db.Model):
             'item_name': self.item.name,
             'item_description': self.item.description
         }
-
-
-with app.app_context():
-    db.create_all()
 
 
 @bucketlist_bp.route('/add', methods=['POST'])
