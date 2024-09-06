@@ -12,16 +12,40 @@ document.addEventListener('keydown', (event) => {
 // Add to Bucket List functionality
 document.querySelectorAll('.add-to-bucket').forEach(button => {
     button.addEventListener('click', function() {
-        alert('Added to Bucket List!');
+        const itemId = this.dataset.itemId;
+        fetch('/bucketlist/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ item_id: itemId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        });
     });
 });
+
 
 // Remove from Bucket List functionality
 document.querySelectorAll('.remove-from-bucket').forEach(button => {
     button.addEventListener('click', function() {
-        alert('Removed from Bucket List!');
+        const itemId = this.dataset.itemId;
+        fetch('/bucketlist/remove', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ item_id: itemId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+        });
     });
 });
+
 
 // Proceed to Checkout functionality
 document.querySelector('.checkout-button').addEventListener('click', function() {
@@ -29,25 +53,12 @@ document.querySelector('.checkout-button').addEventListener('click', function() 
 });
 
 // Basic form validation example
-document.querySelector('form').addEventListener('submit', function(event) {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    if (!email || !password) {
-        alert('Please fill in all fields');
-        event.preventDefault();
-    }
-});
-
-// Basic form validation example
-document.querySelector('form').addEventListener('submit', function(event) {
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const accountType = document.getElementById('account-type').value;
-
-    if (!name || !email || !password || !accountType) {
-        alert('Please fill in all fields');
-        event.preventDefault();
-    }
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(event) {
+        const fields = Array.from(form.querySelectorAll('input')).map(input => input.value);
+        if (fields.some(field => !field)) {
+            alert('Please fill in all fields');
+            event.preventDefault();
+        }
+    });
 });

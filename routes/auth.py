@@ -68,4 +68,3 @@ def update_password():
     db.session.commit()
 
     return jsonify({'message': 'Password updated successfully!'}), 200
-
