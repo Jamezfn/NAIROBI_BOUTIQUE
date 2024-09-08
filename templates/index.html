@@ -4,57 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nairobi Boutique Hub</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="static/css/main.css">
 </head>
 <body>
     <!-- Navbar -->
-    <nav>
-        <div class="logo">
-            <h1>Nairobi Boutique Hub</h1>
-        </div>
-        <div class="auth-links">
-            <a href="/login">Login</a>
-            <a href="/signup">Signup</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Nairobi Boutique Hub</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/signup">Signup</a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 
     <!-- Header -->
-    <header>
-        <h2>Discover Boutiques Around Nairobi</h2>
+    <header class="jumbotron text-center">
+        <div class="container">
+            <h2 class="display-4">Discover Boutiques Around Nairobi</h2>
+        </div>
     </header>
 
     <!-- Main Content -->
     <div class="container">
-        <h3>Featured Boutiques</h3>
-        <div class="boutique-row">
+        <h3 class="text-center">Featured Boutiques</h3>
+        <div class="row">
             <!-- Repeat this block for each boutique -->
-            <div class="boutique-card">
-                <a href="shop.html">
-                    <img src="static/images/shop1.jpg" alt="Shop 1">
-                    <div class="card-info">
-                        <h4>Shop 1</h4>
-                        <p>Shop Description...</p>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <img src="static/images/shop1.jpg" class="card-img-top" alt="Shop 1">
+                    <div class="card-body">
+                        <h4 class="card-title">Shop 1</h4>
+                        <p class="card-text">Shop Description...</p>
                     </div>
-                </a>
+                </div>
             </div>
-            <div class="boutique-card">
-                <a href="shop.html">
-                    <img src="static/images/shop2.jpg" alt="Shop 2">
-                    <div class="card-info">
-                        <h4>Shop 2</h4>
-                        <p>Shop Description...</p>
-                    </div> 
-                </a>
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <img src="static/images/shop2.jpg" class="card-img-top" alt="Shop 2">
+                    <div class="card-body">
+                        <h4 class="card-title">Shop 2</h4>
+                        <p class="card-text">Shop Description...</p>
+                    </div>
+                </div>
             </div>
             <!-- Add more cards here -->
         </div>
     </div>
 
     <!-- Footer -->
-    <footer>
+    <footer class="bg-light text-center py-4">
         <p>&copy; 2024 Nairobi Boutique Hub</p>
     </footer>
 
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="static/js/app.js"></script>
 </body>
 </html>
