@@ -1,0 +1,6 @@
+Flask==2.3.3
+requests==2.31.0
+SQLAlchemy==2.0.34
+Flask-SQLAlchemy==3.0.3
+Flask-Migrate==4.0.3
+gunicorn==21.2.0
