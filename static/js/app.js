@@ -1,4 +1,4 @@
-// Example: Moving the boutique row (like sliding)
+// Scroll boutique row functionality
 const boutiqueRow = document.querySelector('.boutique-row');
 
 document.addEventListener('keydown', (event) => {
@@ -8,6 +8,27 @@ document.addEventListener('keydown', (event) => {
         boutiqueRow.scrollLeft -= 200;
     }
 });
+
+// Fetching boutiques and displaying them dynamically
+fetch('/boutiques/list')  // Changed to fetch boutiques from the backend
+    .then(response => response.json())
+    .then(boutiques => {
+        boutiqueRow.innerHTML = ''; // Clear existing boutique cards
+        boutiques.forEach(boutique => {
+            const boutiqueCard = `
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <img src="static/images/shop-placeholder.jpg" class="card-img-top" alt="${boutique.name}">
+                        <div class="card-body">
+                            <h4 class="card-title">${boutique.name}</h4>
+                            <p class="card-text">${boutique.description}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            boutiqueRow.innerHTML += boutiqueCard;
+        });
+    });
 
 // Add to Bucket List functionality
 document.querySelectorAll('.add-to-bucket').forEach(button => {
@@ -27,17 +48,15 @@ document.querySelectorAll('.add-to-bucket').forEach(button => {
     });
 });
 
-
 // Remove from Bucket List functionality
 document.querySelectorAll('.remove-from-bucket').forEach(button => {
     button.addEventListener('click', function() {
         const itemId = this.dataset.itemId;
-        fetch('/bucketlist/remove', {
-            method: 'POST',
+        fetch(`/bucketlist/remove/${itemId}`, {  // Changed to include item_id in URL
+            method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ item_id: itemId }),
+            }
         })
         .then(response => response.json())
         .then(data => {
@@ -45,7 +64,6 @@ document.querySelectorAll('.remove-from-bucket').forEach(button => {
         });
     });
 });
-
 
 // Proceed to Checkout functionality
 document.querySelector('.checkout-button').addEventListener('click', function() {

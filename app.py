@@ -1,10 +1,11 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from routes.auth import auth_bp
 from routes.boutiques import boutiques_bp
 from routes.bucketlist import bucketlist_bp
+from routes.items import items_bp
 from models.user import db, User
 
 app = Flask(__name__)
@@ -29,12 +30,12 @@ def load_user(user_id):
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(boutiques_bp, url_prefix='/boutiques')
 app.register_blueprint(bucketlist_bp, url_prefix='/bucketlist')
+app.register_blueprint(items_bp, url_prefix='/items')
 
 
 @app.route('/')
 def home():
-    return "Welcome to Nairobi Boutique Hub!"
-
+    return render_template('index.html')
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
