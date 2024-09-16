@@ -1,13 +1,15 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
+from flask import abort
 
 app = Flask(__name__)
-
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///boutiques.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+ma = Marshmallow(app)
 
 
 class Boutique(db.Model):
@@ -37,6 +39,11 @@ with app.app_context():
 @app.route('/boutiques', methods=['POST'])
 def create_boutique():
     data = request.get_json()
+
+    # Validate input
+    if not data.get('name') or not data.get('location') or not isinstance(data.get('owner_id'), int):
+        return jsonify({'error': 'Invalid input'}), 400
+
     new_boutique = Boutique(
         name=data['name'],
         description=data.get('description', ''),

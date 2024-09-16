@@ -10,25 +10,22 @@ document.addEventListener('keydown', (event) => {
 });
 
 // Fetching boutiques and displaying them dynamically
-fetch('/boutiques/list')  // Changed to fetch boutiques from the backend
-    .then(response => response.json())
-    .then(boutiques => {
-        boutiqueRow.innerHTML = ''; // Clear existing boutique cards
-        boutiques.forEach(boutique => {
-            const boutiqueCard = `
-                <div class="col-md-4">
-                    <div class="card mb-4">
-                        <img src="static/images/shop-placeholder.jpg" class="card-img-top" alt="${boutique.name}">
-                        <div class="card-body">
-                            <h4 class="card-title">${boutique.name}</h4>
-                            <p class="card-text">${boutique.description}</p>
-                        </div>
-                    </div>
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/boutiques/list')
+        .then(response => response.json())
+        .then(boutiques => {
+            const boutiqueContainer = document.getElementById('boutique-container');
+            boutiqueContainer.innerHTML = boutiques.map(boutique => `
+                <div class="boutique-card">
+                    <img src="{{ url_for('static', filename='images/shop-placeholder.jpg') }}" alt="${boutique.name}">
+                    <h4>${boutique.name}</h4>
+                    <p>${boutique.description}</p>
                 </div>
-            `;
-            boutiqueRow.innerHTML += boutiqueCard;
-        });
-    });
+            `).join('');
+        })
+        .catch(error => console.error('Error fetching boutiques:', error));
+});
+
 
 // Add to Bucket List functionality
 document.querySelectorAll('.add-to-bucket').forEach(button => {

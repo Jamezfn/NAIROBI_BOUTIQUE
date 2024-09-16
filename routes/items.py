@@ -10,9 +10,15 @@ def create_item(boutique_id):
     boutique = Boutique.query.get_or_404(boutique_id)
     data = request.get_json()
 
+    # Validate input
+    name = data.get('name')
+    price = data.get('price')
+    if not name or not isinstance(price, (int, float)) or price <= 0:
+        return jsonify({'error': 'Invalid input'}), 400
+
     new_item = Item(
-        name=data['name'],
-        price=data['price'],
+        name=name,
+        price=price,
         description=data.get('description', ''),
         boutique_id=boutique.id
     )
@@ -42,6 +48,10 @@ def update_item(id):
     item.name = data.get('name', item.name)
     item.price = data.get('price', item.price)
     item.description = data.get('description', item.description)
+
+    # Validate input
+    if not isinstance(item.price, (int, float)) or item.price <= 0:
+        return jsonify({'error': 'Invalid price'}), 400
 
     db.session.commit()
     return jsonify(item.to_dict())
