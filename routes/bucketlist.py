@@ -5,30 +5,11 @@ from models.item import Item
 
 bucketlist_bp = Blueprint('bucketlist', __name__)
 
-class BucketList(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
-    
-    user = db.relationship('User', backref='bucket_list')
-    item = db.relationship('Item', backref='in_bucket_list')
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'user_id': self.user_id,
-            'item_id': self.item_id,
-            'item_name': self.item.name,
-            'item_description': self.item.description
-        }
-
-
 @bucketlist_bp.route('/add', methods=['POST'])
 @login_required
 def add_to_bucketlist():
     data = request.get_json()
     item_id = data.get('item_id')
-    
     
     if not item_id:
         return jsonify({'error': 'Item ID is required'}), 400
@@ -36,7 +17,6 @@ def add_to_bucketlist():
     item = Item.query.get(item_id)
     if not item:
         return jsonify({'error': 'Item not found'}), 404
-    
     
     existing_entry = BucketList.query.filter_by(user_id=current_user.id, item_id=item_id).first()
     if existing_entry:
@@ -66,3 +46,4 @@ def remove_from_bucketlist(item_id):
     db.session.commit()
     
     return jsonify({'message': 'Item removed from bucket list'}), 200
+
