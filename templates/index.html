@@ -6,7 +6,61 @@
     <title>Nairobi Boutique Hub</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="static/css/main.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f5f7;
+            color: #333;
+        }
+
+        .navbar {
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .jumbotron {
+            background: url('{{ url_for("static", filename="images/hero-bg.jpg") }}') no-repeat center center;
+            background-size: cover;
+            color: #fff;
+            padding: 100px 0;
+            margin-bottom: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .jumbotron h2 {
+            font-size: 3rem;
+            font-weight: 300;
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-img-top {
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        footer {
+            background-color: #f5f5f7;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .btn-custom {
+            background-color: #007aff;
+            color: #fff;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .btn-custom:hover {
+            background-color: #0051a8;
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
@@ -37,29 +91,27 @@
     </header>
 
     <!-- Main Content -->
-    <div class="container">
-        <h3 class="text-center">Featured Boutiques</h3>
+    <div class="container mt-5">
+        <h3 class="text-center mb-4">Featured Boutiques</h3>
         <div class="row">
-            <!-- Repeat this block for each boutique -->
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <img src="static/images/shop1.jpg" class="card-img-top" alt="Shop 1">
-                    <div class="card-body">
-                        <h4 class="card-title">Shop 1</h4>
-                        <p class="card-text">Shop Description...</p>
+            <!-- Check if boutiques exist -->
+            {% if boutiques %}
+                <!-- Loop through boutiques dynamically -->
+                {% for boutique in boutiques %}
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <img src="{{ boutique.image_url or url_for('static', filename='images/default.jpg') }}" class="card-img-top" alt="{{ boutique.name }}">
+                        <div class="card-body">
+                            <h4 class="card-title">{{ boutique.name }}</h4>
+                            <p class="card-text">{{ boutique.description }}</p>
+                            <a href="{{ url_for('boutiques.get_boutique', id=boutique.id) }}" class="btn btn-custom">View Details</a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <img src="static/images/shop2.jpg" class="card-img-top" alt="Shop 2">
-                    <div class="card-body">
-                        <h4 class="card-title">Shop 2</h4>
-                        <p class="card-text">Shop Description...</p>
-                    </div>
-                </div>
-            </div>
-            <!-- Add more cards here -->
+                {% endfor %}
+            {% else %}
+                <p class="text-center">No boutiques available at the moment. Please check back later!</p>
+            {% endif %}
         </div>
     </div>
 
@@ -72,6 +124,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="static/js/app.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>

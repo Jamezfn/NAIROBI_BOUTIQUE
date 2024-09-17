@@ -1,7 +1,7 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 from flask_login import login_required, current_user
 from models.user import db, User
-from models.item import Item
+from models.item import Item, BucketList
 
 bucketlist_bp = Blueprint('bucketlist', __name__)
 
@@ -32,7 +32,8 @@ def add_to_bucketlist():
 @login_required
 def view_bucketlist():
     bucket_list = BucketList.query.filter_by(user_id=current_user.id).all()
-    return jsonify([entry.to_dict() for entry in bucket_list])
+    items = [Item.query.get(entry.item_id) for entry in bucket_list]
+    return render_template('bucket-list.html', items=items)
 
 @bucketlist_bp.route('/remove/<int:item_id>', methods=['DELETE'])
 @login_required

@@ -1,56 +1,62 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, render_template, redirect, url_for, flash
 from models.boutique import db, Boutique
 
 boutiques_bp = Blueprint('boutiques', __name__)
 
-@boutiques_bp.route('/boutiques', methods=['POST'])
+@boutiques_bp.route('/boutiques', methods=['GET', 'POST'])
 def create_boutique():
-    data = request.get_json()
+    if request.method == 'POST':
+        name = request.form.get('name')
+        description = request.form.get('description', '')
+        location = request.form.get('location')
+        owner_id = request.form.get('owner_id')
 
-    # Validate input
-    if not data.get('name') or not data.get('location') or not isinstance(data.get('owner_id'), int):
-        return jsonify({'error': 'Invalid input'}), 400
+        # Validate input
+        if not name or not location or not owner_id.isdigit():
+            flash('Invalid input', 'error')
+            return redirect(url_for('boutiques.create_boutique'))
 
-    new_boutique = Boutique(
-        name=data['name'],
-        description=data.get('description', ''),
-        location=data['location'],
-        owner_id=data['owner_id']
-    )
-    db.session.add(new_boutique)
-    db.session.commit()
-    return jsonify(new_boutique.to_dict()), 201
+        new_boutique = Boutique(
+            name=name,
+            description=description,
+            location=location,
+            owner_id=int(owner_id)
+        )
+        db.session.add(new_boutique)
+        db.session.commit()
+        flash('Boutique created successfully!', 'success')
+        return redirect(url_for('boutiques.list_boutiques'))
 
-@boutiques_bp.route('/boutiques', methods=['GET'])
-def get_boutiques():
-    boutiques = Boutique.query.all()
-    return jsonify([boutique.to_dict() for boutique in boutiques])
+    return render_template('create_boutique.html')
 
 @boutiques_bp.route('/boutiques/<int:id>', methods=['GET'])
 def get_boutique(id):
     boutique = Boutique.query.get_or_404(id)
-    return jsonify(boutique.to_dict())
+    return render_template('shop.html', boutique=boutique)
 
-@boutiques_bp.route('/boutiques/<int:id>', methods=['PUT'])
+@boutiques_bp.route('/boutiques/<int:id>/edit', methods=['GET', 'POST'])
 def update_boutique(id):
-    data = request.get_json()
     boutique = Boutique.query.get_or_404(id)
+    if request.method == 'POST':
+        boutique.name = request.form.get('name', boutique.name)
+        boutique.description = request.form.get('description', boutique.description)
+        boutique.location = request.form.get('location', boutique.location)
 
-    boutique.name = data.get('name', boutique.name)
-    boutique.description = data.get('description', boutique.description)
-    boutique.location = data.get('location', boutique.location)
+        db.session.commit()
+        flash('Boutique updated successfully!', 'success')
+        return redirect(url_for('boutiques.get_boutique', id=boutique.id))
 
-    db.session.commit()
-    return jsonify(boutique.to_dict())
+    return render_template('edit_boutique.html', boutique=boutique)
 
-@boutiques_bp.route('/boutiques/<int:id>', methods=['DELETE'])
+@boutiques_bp.route('/boutiques/<int:id>/delete', methods=['POST'])
 def delete_boutique(id):
     boutique = Boutique.query.get_or_404(id)
     db.session.delete(boutique)
     db.session.commit()
-    return jsonify({'message': 'Boutique deleted'}), 200
+    flash('Boutique deleted successfully!', 'success')
+    return redirect(url_for('boutiques.list_boutiques'))
 
-@boutiques_bp.route('/list', methods=['GET'])
+@boutiques_bp.route('/boutiques/list', methods=['GET'])
 def list_boutiques():
     boutiques = Boutique.query.all()
-    return jsonify([boutique.to_dict() for boutique in boutiques])
+    return render_template('index.html', boutiques=boutiques)
