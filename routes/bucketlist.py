@@ -1,50 +1,56 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models.user import db, User
 from models.item import Item, BucketList
 
 bucketlist_bp = Blueprint('bucketlist', __name__)
 
+
 @bucketlist_bp.route('/add', methods=['POST'])
 @login_required
 def add_to_bucketlist():
-    data = request.get_json()
-    item_id = data.get('item_id')
-    
+    item_id = request.form.get('item_id')
+
     if not item_id:
-        return jsonify({'error': 'Item ID is required'}), 400
-    
+        flash('Item ID is required', 'error')
+        return redirect(url_for('auth.profile'))
+
     item = Item.query.get(item_id)
     if not item:
-        return jsonify({'error': 'Item not found'}), 404
-    
+        flash('Item not found', 'error')
+        return redirect(url_for('auth.profile'))
+
     existing_entry = BucketList.query.filter_by(user_id=current_user.id, item_id=item_id).first()
     if existing_entry:
-        return jsonify({'error': 'Item already in your bucket list'}), 400
-    
+        flash('Item already in your bucket list', 'error')
+        return redirect(url_for('auth.profile'))
+
     new_entry = BucketList(user_id=current_user.id, item_id=item_id)
     db.session.add(new_entry)
     db.session.commit()
 
-    return jsonify(new_entry.to_dict()), 201
+    flash('Item added to your bucket list!', 'success')
+    return redirect(url_for('auth.profile'))
 
 @bucketlist_bp.route('/list', methods=['GET'])
 @login_required
 def view_bucketlist():
     bucket_list = BucketList.query.filter_by(user_id=current_user.id).all()
     items = [Item.query.get(entry.item_id) for entry in bucket_list]
+    
     return render_template('bucket-list.html', items=items)
 
-@bucketlist_bp.route('/remove/<int:item_id>', methods=['DELETE'])
+@bucketlist_bp.route('/remove/<int:item_id>', methods=['POST'])
 @login_required
 def remove_from_bucketlist(item_id):
     entry = BucketList.query.filter_by(user_id=current_user.id, item_id=item_id).first()
     
     if not entry:
-        return jsonify({'error': 'Item not found in your bucket list'}), 404
-    
+        flash('Item not found in your bucket list', 'error')
+        return redirect(url_for('bucketlist.view_bucketlist'))
+
     db.session.delete(entry)
     db.session.commit()
-    
-    return jsonify({'message': 'Item removed from bucket list'}), 200
 
+    flash('Item removed from your bucket list', 'success')
+    return redirect(url_for('bucketlist.view_bucketlist')) 
