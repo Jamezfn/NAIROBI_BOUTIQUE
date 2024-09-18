@@ -119,5 +119,52 @@ class TestAuth(unittest.TestCase):
         self.assertIn(b"You don't have any boutiques yet. Create one above!", response.data)
         self.assertIn(b"Your bucket list is empty. Add items to your bucket list!", response.data)
 
+    def test_update_password(self):
+        # Register a user first
+        self.client.post('/auth/register', data={
+            'username': 'testuser',
+            'email': 'testuser@example.com',
+            'password': 'password123',
+            'confirm-password': 'password123'
+        })
+
+        # Login with the registered user
+        self.client.post('/auth/login', data={
+            'email': 'testuser@example.com',
+            'password': 'password123'
+        })
+
+        # Test case 1: No new password provided
+        response = self.client.put('/auth/update_password', data={
+            'new_password': ''
+        }, follow_redirects=True)
+        
+        # Check if redirected to the profile page
+        self.assertEqual(response.status_code, 200)
+        
+        # Check if the flash message is present in the response after redirect
+        self.assertIn(b'New password is required', response.data)
+
+        # Test case 2: New password provided
+        response = self.client.put('/auth/update_password', data={
+            'new_password': 'newpassword123'
+        }, follow_redirects=True)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Password updated successfully!', response.data)
+
+        # Logout after updating password
+        self.client.get('/auth/logout')
+
+        # Login with the new password to verify update
+        response = self.client.post('/auth/login', data={
+            'email': 'testuser@example.com',
+            'password': 'newpassword123'
+        }, follow_redirects=True)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Sign Up', response.data)  # Check if login was successful
+
 if __name__ == '__main__':
     unittest.main()
+
