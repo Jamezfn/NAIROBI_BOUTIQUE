@@ -11,7 +11,7 @@ from models.user import db, User
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = '12345678'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678@localhost/my_database_name'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345678@localhost:5432/my_database_name'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
