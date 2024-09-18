@@ -58,10 +58,15 @@ def logout():
 @auth_bp.route('/profile', methods=['GET'])
 @login_required
 def profile():
-    return render_template('profile.html',
-                           username=current_user.username,
-                           email=current_user.email,
-                           is_owner=current_user.is_owner)
+    user_boutiques = current_user.boutiques
+    return render_template(
+        'profile.html',
+        username=current_user.username,
+        email=current_user.email,
+        is_owner=current_user.is_owner,
+        user=current_user,
+        bucket_list=current_user.bucket_list
+    )
 
 @auth_bp.route('/update_password', methods=['PUT'])
 @login_required
