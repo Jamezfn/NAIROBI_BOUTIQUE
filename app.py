@@ -3,6 +3,7 @@ from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
+from dotenv import load_dotenv  # Import to load environment variables from .env
 from routes.auth import auth_bp
 from routes.boutiques import boutiques_bp
 from routes.bucketlist import bucketlist_bp
@@ -10,6 +11,9 @@ from routes.items import items_bp
 from models.user import db, User
 from config import config  # Import your config dictionary
 
+# Load environment variables from .env file
+# This should be done before accessing any environment variables
+load_dotenv()  # Added to load the .env file
 
 # Initialize extensions
 migrate = Migrate()
@@ -21,9 +25,10 @@ def create_app(config_name=None):
     # Load the configuration based on the environment
     if config_name is None:
         config_name = 'default'  # Use 'default' if no configuration name is provided
-    
-    app.config.from_object(config[config_name])  # Load the configuration
 
+    app.config.from_object(config[config_name])  # Load the appropriate config class
+
+    # Initialize extensions with the app
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
@@ -47,11 +52,18 @@ def create_app(config_name=None):
     return app
 
 if __name__ == '__main__':
-    # Get the configuration from the environment variable or default to 'development'
+    # Get the configuration from the environment variable or default to 'default'
     config_name = os.getenv('FLASK_ENV', 'default')
+
+    # Create the Flask app with the appropriate configuration
     app = create_app(config_name)
-    
+
+    # Optionally create the database tables (for testing or simple use cases)
+    # If you're using migrations, you don't need this; use flask db migrate/upgrade instead
     with app.app_context():
-        db.create_all()
-        
-    app.run(debug=True)
+        if app.config['TESTING']:
+            db.create_all()  # Only for testing if necessary
+
+    # Run the app with debug mode depending on the environment
+    app.run(debug=app.config['DEBUG'])
+

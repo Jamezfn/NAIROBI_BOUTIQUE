@@ -44,6 +44,9 @@ def login():
 
         login_user(user)
         flash(f'Welcome back, {user.username}!', 'success')
+        next_page = request.args.get('next')
+        if next_page:
+            return redirect(next_page)
         return redirect(url_for('home'))
 
     return render_template('login.html')

@@ -8,7 +8,7 @@ class TestAuth(unittest.TestCase):
     def setUpClass(cls):
         cls.app = create_app('testing')
         cls.app.config['TESTING'] = True
-        cls.app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://my_user:my_password@localhost:5432/my_database_name'
+        cls.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
         cls.client = cls.app.test_client()
         cls.db = db
         with cls.app.app_context():
