@@ -21,10 +21,8 @@ class TestBoutiques(TestCase):
 
     def setUp(self):
         """Set up the database and create a test user."""
-        self.app = self.create_app()  # Make sure the app is created here
         with self.app.app_context():  # Use app context to bind the database
             db.create_all()
-
             # Create a test user
             self.test_user = User(username="testuser", email="test@example.com")
             self.test_user.set_password("password")
