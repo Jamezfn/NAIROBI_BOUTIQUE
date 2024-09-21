@@ -1,14 +1,14 @@
 import unittest
-from app import app, db
+from app import create_app, db
 from models.user import User
 
 class TestAuth(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.app = app
+        cls.app = create_app('testing')
         cls.app.config['TESTING'] = True
-        cls.app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+        cls.app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://my_user:my_password@localhost:5432/my_database_name'
         cls.client = cls.app.test_client()
         cls.db = db
         with cls.app.app_context():

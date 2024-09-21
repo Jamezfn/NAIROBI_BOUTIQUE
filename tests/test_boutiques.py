@@ -1,6 +1,6 @@
 import unittest
 from flask_testing import TestCase
-from app import app, db
+from app import create_app, db
 from models.boutique import Boutique
 from models.user import User
 from flask_login import login_user
@@ -8,8 +8,8 @@ from flask_login import login_user
 class TestBoutiques(TestCase):
 
     def create_app(self):
-        # Configure the app for testing with an in-memory SQLite database
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        app = create_app('testing')
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///', 'test.db')
         app.config['TESTING'] = True
         app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for testing
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

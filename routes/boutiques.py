@@ -7,7 +7,7 @@ boutiques_bp = Blueprint('boutiques', __name__)
 
 @boutiques_bp.route('/create', methods=['GET', 'POST'])
 @login_required
-def create_boutique():
+def create_boutique():                   
     if request.method == 'POST':
         name = request.form.get('name')
         description = request.form.get('description', '')
@@ -27,7 +27,7 @@ def create_boutique():
         db.session.add(new_boutique)
         db.session.commit()
         flash('Boutique created successfully!', 'success')
-        return redirect(url_for('boutiques.list_boutiques'))  # Redirect to list of boutiques
+        return redirect(url_for('auth.profile'))  # Redirect to profile after creating boutique
 
     return render_template('create_boutique.html')
 
@@ -37,7 +37,7 @@ def get_boutique(id):
     boutique = Boutique.query.get_or_404(id)
     if boutique.owner_id != current_user.id:
         flash('You are not authorized to view this boutique', 'danger')
-        return redirect(url_for('boutiques.list_boutiques'))
+        return redirect(url_for('auth.profile'))
 
     return render_template('shop.html', boutique=boutique)
 
@@ -47,7 +47,7 @@ def update_boutique(id):
     boutique = Boutique.query.get_or_404(id)
     if boutique.owner_id != current_user.id:
         flash('You are not authorized to edit this boutique', 'danger')
-        return redirect(url_for('boutiques.list_boutiques'))
+        return redirect(url_for('auth.profile'))
 
     if request.method == 'POST':
         boutique.name = request.form.get('name', boutique.name)
@@ -56,7 +56,7 @@ def update_boutique(id):
 
         db.session.commit()
         flash('Boutique updated successfully!', 'success')
-        return redirect(url_for('boutiques.list_boutiques'))
+        return redirect(url_for('auth.profile'))
 
     return render_template('edit_boutique.html', boutique=boutique)
 
@@ -66,12 +66,12 @@ def delete_boutique(id):
     boutique = Boutique.query.get_or_404(id)
     if boutique.owner_id != current_user.id:
         flash('You are not authorized to delete this boutique', 'danger')
-        return redirect(url_for('boutiques.list_boutiques'))
+        return redirect(url_for('auth.profile'))
 
     db.session.delete(boutique)
     db.session.commit()
     flash('Boutique deleted successfully!', 'success')
-    return redirect(url_for('boutiques.list_boutiques'))
+    return redirect(url_for('auth.profile'))
 
 @boutiques_bp.route('/boutiques/list', methods=['GET'])
 def list_boutiques():
@@ -85,7 +85,7 @@ def add_item(id):
     boutique = Boutique.query.get_or_404(id)
     if boutique.owner_id != current_user.id:
         flash('You are not authorized to add items to this boutique', 'danger')
-        return redirect(url_for('boutiques.list_boutiques'))
+        return redirect(url_for('auth.profile'))
 
     name = request.form.get('name')
     price = request.form.get('price')
@@ -94,7 +94,7 @@ def add_item(id):
     # Validate item inputs
     if not name or not price.isdigit():
         flash('Invalid item details', 'error')
-        return redirect(url_for('boutiques.list_boutiques'))
+        return redirect(url_for('auth.profile'))
 
     new_item = Item(
         name=name,
@@ -105,5 +105,4 @@ def add_item(id):
     db.session.add(new_item)
     db.session.commit()
     flash('Item added successfully!', 'success')
-    return redirect(url_for('boutiques.get_boutique', id=boutique.id))
-
+    return redirect(url_for('auth.profile'))
