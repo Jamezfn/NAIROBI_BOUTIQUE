@@ -1,16 +1,12 @@
 import os
 from flask import Flask, render_template
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from extensions import db, login_manager
 from flask_migrate import Migrate
 from dotenv import load_dotenv  # Import to load environment variables from .env
 from routes.auth import auth_bp
 from routes.boutiques import boutiques_bp
 from routes.bucketlist import bucketlist_bp
 from routes.items import items_bp
-from models.user import db, User
-from models.boutique import Boutique
-from models.item import Item
 from config import config  # Import your config dictionary
 
 # Load environment variables from .env file
@@ -19,7 +15,6 @@ load_dotenv()  # Added to load the .env file
 
 # Initialize extensions
 migrate = Migrate()
-login_manager = LoginManager()
 
 def create_app(config_name=None):
     app = Flask(__name__)
@@ -28,13 +23,13 @@ def create_app(config_name=None):
     if config_name is None:
         config_name = 'default'  # Use 'default' if no configuration name is provided
 
-    app.config.from_object(config[config_name])  # Load the appropriate config class
-
-    # Initialize extensions with the app
+    app.config.from_object(config[config_name])
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
+    from models.user import User
+    from models.item import Item, Boutique, BucketList
 
     @login_manager.user_loader
     def load_user(user_id):

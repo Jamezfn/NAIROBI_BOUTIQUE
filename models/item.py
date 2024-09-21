@@ -1,4 +1,4 @@
-from . import db
+from extensions import db
 from .user import User
 
 class Boutique(db.Model):
@@ -47,6 +47,8 @@ class Item(db.Model):
         }
 
 class BucketList(db.Model):
+    __tablename__ = 'bucket_list'
+
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
