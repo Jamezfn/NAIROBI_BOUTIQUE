@@ -9,6 +9,8 @@ from routes.boutiques import boutiques_bp
 from routes.bucketlist import bucketlist_bp
 from routes.items import items_bp
 from models.user import db, User
+from models.boutique import Boutique
+from models.item import Item
 from config import config  # Import your config dictionary
 
 # Load environment variables from .env file
