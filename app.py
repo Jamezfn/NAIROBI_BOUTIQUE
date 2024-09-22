@@ -28,8 +28,10 @@ def create_app(config_name=None):
     migrate.init_app(app, db)
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
-    from models.user import User
-    from models.item import Item, Boutique, BucketList
+
+    with app.app_context():
+        from models.user import User
+        from models.item import Item, Boutique, BucketList
 
     @login_manager.user_loader
     def load_user(user_id):

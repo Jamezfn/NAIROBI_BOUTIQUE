@@ -9,8 +9,6 @@ class Boutique(db.Model):
     description = db.Column(db.String(500), nullable=True)
     location = db.Column(db.String(100), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    
-    # Relationship with Item
     items = db.relationship('Item', backref='boutique', lazy=True)
 
     def __repr__(self):

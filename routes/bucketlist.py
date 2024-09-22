@@ -1,6 +1,7 @@
 from flask import Blueprint, request, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
-from models.user import db, User
+from extensions import db
+from models.user import User
 from models.item import Item, BucketList
 
 bucketlist_bp = Blueprint('bucketlist', __name__)

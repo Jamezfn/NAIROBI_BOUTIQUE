@@ -5,7 +5,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app import create_app
 from extensions import db
-from models.boutique import Boutique
+from models.item import Boutique
 from models.user import User
 
 class TestBoutiques(TestCase):
@@ -13,21 +13,18 @@ class TestBoutiques(TestCase):
     def create_app(self):
         """Set up the application in testing mode."""
         app = create_app('testing')
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev_app.db'
-        app.config['TESTING'] = True
         app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for testing
-        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         return app
 
     def setUp(self):
         """Set up the database and create a test user."""
-        with self.app.app_context():  # Use app context to bind the database
+        with self.app.app_context():
             db.create_all()
-            # Create a test user
             self.test_user = User(username="testuser", email="test@example.com")
             self.test_user.set_password("password")
             db.session.add(self.test_user)
             db.session.commit()
+            self.test_user_id = self.test_user.id
 
     def tearDown(self):
         """Clean up after each test."""
@@ -37,9 +34,9 @@ class TestBoutiques(TestCase):
 
     def test_get_create_boutique(self):
         """Test GET request to the create boutique page."""
-        # Log in the test user
+        # Log in the test user using email (if your login uses email)
         self.client.post('/auth/login', data={
-            'username': 'testuser',
+            'username': 'testuser',  # or 'email': 'test@example.com' depending on auth.py
             'password': 'password'
         }, follow_redirects=True)
 
@@ -54,7 +51,7 @@ class TestBoutiques(TestCase):
         """Test POST request to create a new boutique."""
         # Log in the test user
         self.client.post('/auth/login', data={
-            'username': 'testuser',
+            'username': 'testuser',  # or 'email': 'test@example.com'
             'password': 'password'
         }, follow_redirects=True)
 
@@ -77,7 +74,7 @@ class TestBoutiques(TestCase):
         """Test POST request with invalid input."""
         # Log in the test user
         self.client.post('/auth/login', data={
-            'username': 'testuser',
+            'username': 'testuser',  # or 'email': 'test@example.com'
             'password': 'password'
         }, follow_redirects=True)
 
@@ -90,7 +87,56 @@ class TestBoutiques(TestCase):
 
         # Ensure the POST request failed due to invalid input
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Invalid input', response.data)
+        self.assertIn(b'Invalid input', response.data)  # Ensure the flash message is correct
+
+    def test_get_boutique(self):
+        """Test GET request to view a boutique."""
+        with self.app.app_context():
+            test_user = User.query.filter_by(username='testuser').first()
+            self.assertIsNotNone(test_user, "Test user should exist in the database.")
+
+            # Create a boutique owned by the test user
+            boutique = Boutique(
+                name='Test Boutique',
+                description='A test boutique',
+                location='Nairobi',
+                owner_id=self.test_user.id
+            )
+            db.session.add(boutique)
+            db.session.commit()
+            boutique_id = boutique.id
+
+        # Log in the test user
+        self.client.post('/auth/login', data={
+            'username': 'testuser',
+            'password': 'password'
+            }, follow_redirects=True)
+
+        # Access the boutique as the owner
+        response = self.client.get(f'/boutiques/{boutique_id}')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Test Boutique', response.data)
+        self.assertIn(b'A test boutique', response.data)
+
+        # Create a second user
+        with self.app.app_context():
+            other_user = User(username='otheruser', email='other@example.com')
+            other_user.set_password('password')
+            db.session.add(other_user)
+            db.session.commit()
+
+        # Log in as the other user
+        self.client.post('/auth/logout', follow_redirects=True)
+        self.client.post('/auth/login', data={
+            'username': 'otheruser',
+            'password': 'password'
+        }, follow_redirects=True)
+
+        # Try to access the boutique as a non-owner
+        response = self.client.get(f'/boutiques/{boutique_id}', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'You are not authorized to view this boutique', response.data)
+        self.assertIn(b'Profile', response.data)  # Adjust based on your profile page content
 
 if __name__ == '__main__':
     unittest.main()

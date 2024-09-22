@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, redirect, url_for, flash
 from flask_login import login_required, current_user
-from models.item import db, Item, Boutique
+from extensions import db
+from models.item import Item, Boutique
 
 items_bp = Blueprint('items', __name__)
 
