@@ -1,5 +1,9 @@
 import unittest
-from app import create_app, db
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from app import create_app
+from extensions import db
 from models.user import User
 
 class TestAuth(unittest.TestCase):
@@ -75,7 +79,7 @@ class TestAuth(unittest.TestCase):
         with self.client.session_transaction() as session:
             self.assertIn('_user_id', session)
 
-        # Perform logout
+        # Perform logout (make sure it's a POST request)
         response = self.client.post('/auth/logout', follow_redirects=True)
 
         # Verify the user is logged out and redirected to the login page
@@ -130,12 +134,12 @@ class TestAuth(unittest.TestCase):
 
         # Login with the registered user
         self.client.post('/auth/login', data={
-            'email': 'testuser@example.com',
+            'username': 'testuser',
             'password': 'password123'
         })
 
         # Test case 1: No new password provided
-        response = self.client.put('/auth/update_password', data={
+        response = self.client.post('/auth/update_password', data={
             'new_password': ''
         }, follow_redirects=True)
         
@@ -146,7 +150,7 @@ class TestAuth(unittest.TestCase):
         self.assertIn(b'New password is required', response.data)
 
         # Test case 2: New password provided
-        response = self.client.put('/auth/update_password', data={
+        response = self.client.post('/auth/update_password', data={
             'new_password': 'newpassword123'
         }, follow_redirects=True)
         
@@ -154,17 +158,17 @@ class TestAuth(unittest.TestCase):
         self.assertIn(b'Password updated successfully!', response.data)
 
         # Logout after updating password
-        self.client.get('/auth/logout')
+        self.client.post('/auth/logout')
 
         # Login with the new password to verify update
         response = self.client.post('/auth/login', data={
-            'email': 'testuser@example.com',
+            'username': 'testuser',
             'password': 'newpassword123'
         }, follow_redirects=True)
         
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Sign Up', response.data)  # Check if login was successful
-
+        self.assertIn(b'<h2 class="display-4">Discover Boutiques Around Nairobi</h2>', response.data)  
+        
 if __name__ == '__main__':
     unittest.main()
 

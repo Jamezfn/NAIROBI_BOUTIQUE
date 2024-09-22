@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,31 +10,45 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">Nairobi Boutique Hub</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" href="{{ url_for('home') }}">Nairobi Boutique Hub</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
+                    <!-- Check if user is authenticated -->
+                    {% if current_user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
+                        <a class="nav-link" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/boutiques/list">Shop</a>
+                        <a class="nav-link" href="{{ url_for('boutiques.list') }}">Shop</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/bucket-list">Bucket List</a>
+                        <a class="nav-link" href="{{ url_for('bucketlist.view') }}">Bucket List</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/profile">My Profile</a>
+                        <a class="nav-link" href="{{ url_for('auth.profile') }}">My Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/logout">Logout</a>
+                        <form action="{{ url_for('auth.logout') }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn nav-link" style="background:none; border:none;">Logout</button>
+                        </form>
                     </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('auth.register') }}">Sign Up</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -54,11 +69,19 @@
             {% for item in boutique.items %}
             <div class="col-md-4">
                 <div class="card mb-4 shadow-sm">
-                    <img src="{{ url_for('static', filename='images/' + item.image) }}" class="card-img-top" alt="{{ item.name }}">
+                    <img src="{{ url_for('static', filename='images/' + item.image) }}" class="card-img-top" alt="{{ item.name }}" onerror="this.onerror=null;this.src='{{ url_for(static, filename=images/default.jpg) }}';">
                     <div class="card-body">
                         <h5 class="card-title">{{ item.name }}</h5>
                         <p class="card-text">Price: kSh {{ item.price }}/=</p>
-                        <button class="btn btn-primary btn-block add-to-bucket-list" data-item-id="{{ item.id }}">Add to Bucket List</button>
+                        <!-- Only show add to bucket list if user is authenticated -->
+                        {% if current_user.is_authenticated %}
+                        <form action="{{ url_for('bucketlist.add_item', item_id=item.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-primary btn-block">Add to Bucket List</button>
+                        </form>
+                        {% else %}
+                        <p class="text-muted">Login to add items to your bucket list.</p>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-block">Login</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -78,4 +101,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
+
 </html>
+
