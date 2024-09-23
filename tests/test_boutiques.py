@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from app import create_app
 from flask_wtf import CSRFProtect
 from extensions import db
-from models.item import Boutique
+from models.item import Boutique, Item
 from models.user import User
 
 class TestBoutiques(TestCase):
@@ -269,6 +269,107 @@ class TestBoutiques(TestCase):
         with self.app.app_context():
             existing_boutique = Boutique.query.get(boutique_id)
             self.assertIsNotNone(existing_boutique)
+    def test_add_item(self):
+        """Test the add_item route for authorized and unauthorized users, and input validation."""
+        with self.app.app_context():
+            # Create a boutique owned by the test user
+            boutique = Boutique(
+                name='Test Boutique',
+                description='A boutique for adding items',
+                location='Test Location',
+                owner_id=self.test_user_id
+            )
+            db.session.add(boutique)
+            db.session.commit()
+            boutique_id = boutique.id
+
+            # Create a second user (non-owner)
+            other_user = User(username='otheruser', email='other@example.com')
+            other_user.set_password('password')
+            db.session.add(other_user)
+            db.session.commit()
+            other_user_id = other_user.id
+
+        # Log in as the test user (owner)
+        self.client.post('/auth/login', data={
+            'username': 'testuser',
+            'password': 'password'
+        }, follow_redirects=True)
+
+        # Attempt to add an item with valid data
+        response = self.client.post(f'/boutiques/{boutique_id}/items/add', data={
+            'name': 'Test Item',
+            'price': '100',
+            'description': 'A test item description'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Item added successfully!', response.data)
+
+        # Verify that the item was added to the database
+        with self.app.app_context():
+            item = Item.query.filter_by(name='Test Item', boutique_id=boutique_id).first()
+            self.assertIsNotNone(item)
+            self.assertEqual(item.price, 100.0)
+            self.assertEqual(item.description, 'A test item description')
+        # Log out the test user
+        self.client.post('/auth/logout', follow_redirects=True)
+
+        # Log in as the other user (non-owner)
+        self.client.post('/auth/login', data={
+            'username': 'otheruser',
+            'password': 'password'
+        }, follow_redirects=True)
+
+        # Attempt to add an item as non-owner
+        response = self.client.post(f'/boutiques/{boutique_id}/items/add', data={
+            'name': 'Unauthorized Item',
+            'price': '50',
+            'description': 'Should not be added'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'You are not authorized to add items to this boutique', response.data)
+
+        # Verify that the item was not added to the database
+        with self.app.app_context():
+            item = Item.query.filter_by(name='Unauthorized Item', boutique_id=boutique_id).first()
+            self.assertIsNone(item)
+
+        # Log out the other user
+        self.client.post('/auth/logout', follow_redirects=True)
+
+        # Log in as the test user again (owner)
+        self.client.post('/auth/login', data={
+            'username': 'testuser',
+            'password': 'password'
+        }, follow_redirects=True)
+
+        # Attempt to add an item with invalid data (missing name)
+        response = self.client.post(f'/boutiques/{boutique_id}/items/add', data={
+            'name': '',
+            'price': '100',
+            'description': 'No name provided'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Invalid item details', response.data)
+
+        # Verify that the item was not added to the database
+        with self.app.app_context():
+            item = Item.query.filter_by(description='No name provided', boutique_id=boutique_id).first()
+            self.assertIsNone(item)
+
+         # Attempt to add an item with invalid data (non-digit price)
+        response = self.client.post(f'/boutiques/{boutique_id}/items/add', data={
+            'name': 'Invalid Price Item',
+            'price': 'abc',
+            'description': 'Invalid price provided'
+        }, follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Invalid item details', response.data)
+
+        # Verify that the item was not added to the database
+        with self.app.app_context():
+            item = Item.query.filter_by(name='Invalid Price Item', boutique_id=boutique_id).first()
+            self.assertIsNone(item)
 
 if __name__ == '__main__':
     unittest.main()
