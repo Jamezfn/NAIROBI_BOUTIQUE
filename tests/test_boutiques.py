@@ -202,6 +202,74 @@ class TestBoutiques(TestCase):
         self.assertIn(b'You are not authorized to edit this boutique', response.data)
         self.assertIn(b'User Profile', response.data)
 
+    def test_delete_boutique(self):
+        """Test the delete_boutique route for authorized and unauthorized users."""
+        with self.app.app_context():
+            # Create a boutique owned by the test user
+            boutique = Boutique(
+                name='Test Boutique',
+                description='A boutique to be deleted',
+                location='Test Location',
+                owner_id=self.test_user_id
+            )
+            db.session.add(boutique)
+            db.session.commit()
+            boutique_id = boutique.id
+
+            # Create a second user (non-owner)
+            other_user = User(username='otheruser', email='other@example.com')
+            other_user.set_password('password')
+            db.session.add(other_user)
+            db.session.commit()
+            other_user_id = other_user.id
+
+        # Log in as the test user (owner)
+        self.client.post('/auth/login', data={
+            'username': 'testuser',
+            'password': 'password'
+        }, follow_redirects=True)
+
+        # Delete the boutique (POST request)
+        response = self.client.post(f'/boutiques/{boutique_id}/delete', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Boutique deleted successfully!', response.data)
+
+        # Verify that the boutique was deleted from the database
+        with self.app.app_context():
+            deleted_boutique = Boutique.query.get(boutique_id)
+            self.assertIsNone(deleted_boutique)
+
+        # Log out the test user
+        self.client.post('/auth/logout', follow_redirects=True)
+
+        # Re-create the boutique for the non-owner test
+        with self.app.app_context():
+            boutique = Boutique(
+                name='Test Boutique',
+                description='A boutique to be deleted',
+                location='Test Location',
+                owner_id=self.test_user_id
+            )
+            db.session.add(boutique)
+            db.session.commit()
+            boutique_id = boutique.id
+
+        # Log in as the other user (non-owner)
+        self.client.post('/auth/login', data={
+            'username': 'otheruser',
+            'password': 'password'
+        }, follow_redirects=True)
+
+        # Attempt to delete the boutique as non-owner
+        response = self.client.post(f'/boutiques/{boutique_id}/delete', follow_redirects=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'You are not authorized to delete this boutique', response.data)
+
+        # Verify that the boutique was not deleted from the database
+        with self.app.app_context():
+            existing_boutique = Boutique.query.get(boutique_id)
+            self.assertIsNotNone(existing_boutique)
+
 if __name__ == '__main__':
     unittest.main()
 
