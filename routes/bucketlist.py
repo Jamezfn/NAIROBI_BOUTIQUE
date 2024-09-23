@@ -6,24 +6,30 @@ from models.item import Item, BucketList
 
 bucketlist_bp = Blueprint('bucketlist', __name__)
 
-
 @bucketlist_bp.route('/add', methods=['POST'])
 @login_required
 def add_to_bucketlist():
     item_id = request.form.get('item_id')
 
     if not item_id:
-        flash('Item ID is required', 'error')
+        flash('Item ID is required', 'danger')
+        return redirect(url_for('auth.profile'))
+
+    # Convert item_id to integer and handle potential ValueError
+    try:
+        item_id = int(item_id)
+    except ValueError:
+        flash('Invalid Item ID', 'danger')
         return redirect(url_for('auth.profile'))
 
     item = Item.query.get(item_id)
     if not item:
-        flash('Item not found', 'error')
+        flash('Item not found', 'danger')
         return redirect(url_for('auth.profile'))
 
     existing_entry = BucketList.query.filter_by(user_id=current_user.id, item_id=item_id).first()
     if existing_entry:
-        flash('Item already in your bucket list', 'error')
+        flash('Item already in your bucket list', 'warning')
         return redirect(url_for('auth.profile'))
 
     new_entry = BucketList(user_id=current_user.id, item_id=item_id)
@@ -31,13 +37,14 @@ def add_to_bucketlist():
     db.session.commit()
 
     flash('Item added to your bucket list!', 'success')
-    return redirect(url_for('auth.profile'))
+    return redirect(url_for('bucketlist.view_bucketlist'))
 
 @bucketlist_bp.route('/list', methods=['GET'])
 @login_required
 def view_bucketlist():
-    bucket_list = BucketList.query.filter_by(user_id=current_user.id).all()
-    items = [Item.query.get(entry.item_id) for entry in bucket_list]
+    # Optimize query to retrieve all items in one call
+    items = db.session.query(Item).join(BucketList, Item.id == BucketList.item_id)\
+        .filter(BucketList.user_id == current_user.id).all()
     
     return render_template('bucket-list.html', items=items)
 
@@ -47,7 +54,7 @@ def remove_from_bucketlist(item_id):
     entry = BucketList.query.filter_by(user_id=current_user.id, item_id=item_id).first()
     
     if not entry:
-        flash('Item not found in your bucket list', 'error')
+        flash('Item not found in your bucket list', 'danger')
         return redirect(url_for('bucketlist.view_bucketlist'))
 
     db.session.delete(entry)
@@ -55,3 +62,4 @@ def remove_from_bucketlist(item_id):
 
     flash('Item removed from your bucket list', 'success')
     return redirect(url_for('bucketlist.view_bucketlist')) 
+
