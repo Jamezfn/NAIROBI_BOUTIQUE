@@ -27,6 +27,22 @@
         </div>
     </nav>
 
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
     <!-- Login Form Section -->
     <div class="container my-5">
         <div class="row justify-content-center">
@@ -37,8 +53,10 @@
                     </div>
                     <div class="card-body">
                         <form action="{{ url_for('auth.login') }}" method="POST">
+                            <!-- CSRF Token (if using CSRF protection) -->
+                            {{ csrf_token() }}
                             <div class="form-group">
-                                <label for="username">Username</label>  <!-- Adjusted from email to username -->
+                                <label for="username">Username</label> <!-- Adjusted from email to username -->
                                 <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required>
                             </div>
                             <div class="form-group">

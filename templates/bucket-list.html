@@ -82,7 +82,7 @@
                 {% for item in items %}
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm">
-                        <img src="{{ url_for('static', filename='images/' + item.image) }}" class="card-img-top" alt="{{ item.name }}" onerror="this.onerror=null;this.src='{{ url_for(static, filename=images/default.jpg) }}';">
+                        <img src="{{ url_for('static', filename='images/' + (item.image|default('default.jpg'))) }}" class="card-img-top" alt="{{ item.name }}" onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default.jpg') }}';">
                         <div class="card-body">
                             <h5 class="card-title">{{ item.name }}</h5>
                             <p class="card-text">Price: kSh {{ item.price }}/=</p>

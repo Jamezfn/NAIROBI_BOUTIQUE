@@ -73,7 +73,7 @@ def delete_boutique(id):
     flash('Boutique deleted successfully!', 'success')
     return redirect(url_for('auth.profile'))
 
-@boutiques_bp.route('/list', methods=['GET'], endpoint='list')
+@boutiques_bp.route('/list', methods=['GET'])
 def list_boutiques():
     boutiques = Boutique.query.all()
     return render_template('index.html', boutiques=boutiques)

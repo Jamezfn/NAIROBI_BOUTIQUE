@@ -10,6 +10,7 @@ class Boutique(db.Model):
     location = db.Column(db.String(100), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     items = db.relationship('Item', backref='boutique', lazy=True)
+    items = db.relationship('Item', back_populates='boutique')
 
     def __repr__(self):
         return f'<Boutique(id={self.id}, name={self.name})>'
@@ -31,6 +32,8 @@ class Item(db.Model):
     price = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(500), nullable=True)
     boutique_id = db.Column(db.Integer, db.ForeignKey('boutique.id'), nullable=False)
+    image = db.Column(db.String(255), default='default.jpg')
+    boutique = db.relationship('Boutique', back_populates='items')
 
     def __repr__(self):
         return f'<Item(id={self.id}, name={self.name}, price={self.price})>'

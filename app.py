@@ -33,6 +33,11 @@ def create_app(config_name=None):
         from models.user import User
         from models.item import Item, Boutique, BucketList
 
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        # Redirect to the login page with `next` parameter
+        return redirect(url_for('auth.login', next=request.url), code=303)
+
     @login_manager.user_loader
     def load_user(user_id):
         return db.session.get(User, int(user_id))

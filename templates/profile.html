@@ -130,7 +130,7 @@
                                 </div>
                                 <div>
                                     <!-- Remove from Bucket List Button -->
-                                    <form action="{{ url_for('bucketlist.remove_item', item_id=item.id) }}" method="POST" class="d-inline">
+                                    <form action="{{ url_for('bucketlist.remove_from_bucketlist', item_id=item.id) }}" method="POST" class="d-inline">
                                         <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to remove this item from your bucket list?');">
                                             Remove
                                         </button>

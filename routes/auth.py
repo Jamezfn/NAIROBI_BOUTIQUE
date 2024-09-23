@@ -43,13 +43,19 @@ def login():
         username = data.get('username')
         password = data.get('password')
 
+        # Check for missing credentials
+        if not username or not password:
+            flash('Please enter both username and password', 'danger')
+            return render_template('login.html'), 400  # Bad Request
+
         # Ensure username comparison is case insensitive
         user = User.query.filter(db.func.lower(User.username) == db.func.lower(username)).first()
 
+
         # Validate user credentials
         if user is None or not user.check_password(password):
-            flash('Invalid login credentials', 'error')  # Changed to avoid revealing specifics
-            return redirect(url_for('auth.login'))
+            flash('Invalid login credentials', 'danger')  # Changed to avoid revealing specifics
+            return render_template('login.html'), 401  # Unauthorized
 
         # Login user
         login_user(user)
@@ -59,9 +65,10 @@ def login():
         next_page = request.args.get('next')
         if next_page:
             return redirect(next_page)
-        return redirect(url_for('home'))
-
-    return render_template('login.html')
+        else:
+            return redirect(url_for('home'))
+    else:
+        return render_template('login.html')
 
 @auth_bp.route('/logout', methods=['POST'])
 @login_required
