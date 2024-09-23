@@ -15,7 +15,6 @@ class TestBoutiques(TestCase):
         """Set up the application in testing mode."""
         app = create_app('testing')
         app.config['WTF_CSRF_ENABLED'] = False  # Disable CSRF for testing
-        csrf = CSRFProtect(app)
         return app
 
     def setUp(self):
@@ -201,7 +200,7 @@ class TestBoutiques(TestCase):
         response = self.client.get(f'/boutiques/{boutique_id}/edit', follow_redirects=True)
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'You are not authorized to edit this boutique', response.data)
-        self.assertIn(b'My Profile', response.data)
+        self.assertIn(b'User Profile', response.data)
 
 if __name__ == '__main__':
     unittest.main()

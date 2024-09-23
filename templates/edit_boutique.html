@@ -63,7 +63,7 @@
                         <a class="nav-link" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('boutiques.list_boutiques') }}">Shop</a>
+                        <a class="nav-link" href="{{ url_for('boutiques.list') }}">Shop</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('bucketlist.view_bucketlist') }}">Bucket List</a>
@@ -107,8 +107,7 @@
 
         <h2 class="text-center mb-4">Edit Boutique</h2>
         <form method="POST" action="{{ url_for('boutiques.update_boutique', id=boutique.id) }}">
-		<!-- CSRF Token (if using Flask-WTF) -->
-		{% csrf_token %}
+            <!-- CSRF Token removed -->
             <div class="form-group">
                 <label for="name">Boutique Name</label>
                 <input type="text" class="form-control" id="name" name="name" value="{{ boutique.name }}" required>
