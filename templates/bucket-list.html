@@ -13,22 +13,25 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">Nairobi Boutique Hub</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" href="{{ url_for('home') }}">Nairobi Boutique Hub</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
+                    {% if current_user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('boutiques.list') }}">Shop</a>
+                        <!-- Adjusted endpoint name -->
+                        <a class="nav-link" href="{{ url_for('boutiques.list_boutiques') }}">Shop</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('bucketlist.view') }}">Bucket List</a>
+                        <!-- Adjusted endpoint name -->
+                        <a class="nav-link" href="{{ url_for('bucketlist.view_bucketlist') }}">Bucket List</a>
                     </li>
-                    {% if current_user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('auth.profile') }}">My Profile</a>
                     </li>
@@ -60,16 +63,33 @@
 
     <!-- Bucket List Items Section -->
     <div class="container my-5">
+        <!-- Display flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
         <div class="row">
             {% if items %}
                 {% for item in items %}
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm">
-                        <img src="{{ url_for('static', filename='images/' + item.image) }}" class="card-img-top" alt="{{ item.name }}">
+                        <img src="{{ url_for('static', filename='images/' + item.image) }}" class="card-img-top" alt="{{ item.name }}" onerror="this.onerror=null;this.src='{{ url_for(static, filename=images/default.jpg) }}';">
                         <div class="card-body">
                             <h5 class="card-title">{{ item.name }}</h5>
                             <p class="card-text">Price: kSh {{ item.price }}/=</p>
-                            <button class="btn btn-danger btn-block remove-from-bucket-list" data-item-id="{{ item.id }}">Remove</button>
+                            <!-- Remove button -->
+                            <form action="{{ url_for('bucketlist.remove_from_bucketlist', item_id=item.id) }}" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-block">Remove</button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -79,13 +99,6 @@
             {% endif %}
         </div>
     </div>
-
-    <!-- Checkout Section -->
-    {% if items %}
-    <div class="container text-center my-5">
-        <button class="btn btn-success btn-lg checkout-button">Proceed to Checkout</button>
-    </div>
-    {% endif %}
 
     <!-- Footer -->
     <footer class="bg-dark text-white text-center py-4">

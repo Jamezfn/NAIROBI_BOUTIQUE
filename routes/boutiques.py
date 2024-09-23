@@ -31,7 +31,7 @@ def create_boutique():
 
     return render_template('create_boutique.html')
 
-@boutiques_bp.route('/boutiques/<int:id>', methods=['GET'])
+@boutiques_bp.route('/<int:id>', methods=['GET'])
 @login_required
 def get_boutique(id):
     boutique = Boutique.query.get_or_404(id)
@@ -41,7 +41,7 @@ def get_boutique(id):
 
     return render_template('shop.html', boutique=boutique)
 
-@boutiques_bp.route('/boutiques/<int:id>/edit', methods=['GET', 'POST'])
+@boutiques_bp.route('/<int:id>/edit', methods=['GET', 'POST'])
 @login_required
 def update_boutique(id):
     boutique = Boutique.query.get_or_404(id)
@@ -60,7 +60,7 @@ def update_boutique(id):
 
     return render_template('edit_boutique.html', boutique=boutique)
 
-@boutiques_bp.route('/boutiques/<int:id>/delete', methods=['POST'])
+@boutiques_bp.route('/<int:id>/delete', methods=['POST'])
 @login_required
 def delete_boutique(id):
     boutique = Boutique.query.get_or_404(id)
@@ -73,13 +73,14 @@ def delete_boutique(id):
     flash('Boutique deleted successfully!', 'success')
     return redirect(url_for('auth.profile'))
 
-@boutiques_bp.route('/boutiques/list', methods=['GET'])
+@boutiques_bp.route('/list', methods=['GET'], endpoint='list')
 def list_boutiques():
     boutiques = Boutique.query.all()
     return render_template('index.html', boutiques=boutiques)
 
+
 # Add route to handle adding items to a boutique
-@boutiques_bp.route('/boutiques/<int:id>/items/add', methods=['POST'])
+@boutiques_bp.route('/<int:id>/items/add', methods=['POST'])
 @login_required
 def add_item(id):
     boutique = Boutique.query.get_or_404(id)
