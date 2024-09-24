@@ -25,11 +25,9 @@
                         <a class="nav-link" href="{{ url_for('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <!-- Adjusted endpoint name -->
                         <a class="nav-link" href="{{ url_for('boutiques.list_boutiques') }}">Shop</a>
                     </li>
                     <li class="nav-item">
-                        <!-- Adjusted endpoint name -->
                         <a class="nav-link" href="{{ url_for('bucketlist.view_bucketlist') }}">Bucket List</a>
                     </li>
                     <li class="nav-item">
@@ -64,7 +62,7 @@
     <!-- Bucket List Items Section -->
     <div class="container my-5">
         <!-- Display flash messages -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% with messages = get_flashed_messages(with_categories=True) %}
             {% if messages %}
                 {% for category, message in messages %}
                 <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
@@ -82,7 +80,9 @@
                 {% for item in items %}
                 <div class="col-md-4">
                     <div class="card mb-4 shadow-sm">
-                        <img src="{{ url_for('static', filename='images/' + (item.image|default('default.jpg'))) }}" class="card-img-top" alt="{{ item.name }}" onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default.jpg') }}';">
+                        <img src="{{ url_for('static', filename='images/' + (item.image|default('default.jpg'))) }}" 
+                             class="card-img-top" alt="{{ item.name }}" 
+                             onerror="this.onerror=null;this.src='{{ url_for('static', filename='images/default.jpg') }}';">
                         <div class="card-body">
                             <h5 class="card-title">{{ item.name }}</h5>
                             <p class="card-text">Price: kSh {{ item.price }}/=</p>

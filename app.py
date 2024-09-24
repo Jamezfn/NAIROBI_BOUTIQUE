@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for, request
 from extensions import db, login_manager
 from flask_migrate import Migrate
 from dotenv import load_dotenv  # Import to load environment variables from .env

@@ -6,6 +6,7 @@
     <title>Nairobi Boutique Hub</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <style>
         body {
@@ -67,7 +68,8 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
             <a class="navbar-brand" href="#">Nairobi Boutique Hub</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -95,6 +97,22 @@
         </div>
     </nav>
 
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
     <!-- Header -->
     <header class="jumbotron text-center">
         <div class="container">
@@ -112,7 +130,8 @@
                 {% for boutique in boutiques %}
                 <div class="col-md-4">
                     <div class="card mb-4">
-                        <img src="{{ boutique.image_url or url_for('static', filename='images/default.jpg') }}" class="card-img-top" alt="{{ boutique.name }}">
+                        <img src="{{ boutique.image_url or url_for('static', filename='images/default.jpg') }}" 
+                             class="card-img-top" alt="{{ boutique.name }}">
                         <div class="card-body">
                             <h4 class="card-title">{{ boutique.name }}</h4>
                             <p class="card-text">{{ boutique.description }}</p>
@@ -139,3 +158,4 @@
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 </html>
+
