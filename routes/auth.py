@@ -92,19 +92,43 @@ def profile():
         bucket_list=current_user.bucket_list
     )
 
-@auth_bp.route('/update_password', methods=['POST'])  # Adjusted to POST for form submission
+@auth_bp.route('/update_password', methods=['GET', 'POST'])
 @login_required
 def update_password():
-    new_password = request.form.get('new_password')
+    if request.method == 'POST':
+        current_password = request.form.get('current_password')
+        new_password = request.form.get('new_password')
+        confirm_new_password = request.form.get('confirm_new_password')
 
-    # Ensure a new password is provided
-    if not new_password:
-        flash('New password is required', 'error')
+        # Validate form data
+        errors = False
+        if not current_password:
+            flash('Please enter your current password.', 'danger')
+            errors = True
+        if not new_password:
+            flash('Please enter a new password.', 'danger')
+            errors = True
+        if not confirm_new_password:
+            flash('Please confirm your new password.', 'danger')
+            errors = True
+        if new_password != confirm_new_password:
+            flash('Passwords must match.', 'danger')
+            errors = True
+        if new_password and len(new_password) < 8:
+            flash('Password must be at least 8 characters long.', 'danger')
+            errors = True
+        if errors:
+            return render_template('update_password.html'), 400  # Bad Request
+
+        # Validate current password
+        if not current_user.check_password(current_password):
+            flash('Current password is incorrect.', 'danger')
+            return render_template('update_password.html'), 401  # Unauthorized
+
+        # Update password
+        current_user.set_password(new_password)
+        db.session.commit()
+        flash('Your password has been updated successfully.', 'success')
         return redirect(url_for('auth.profile'))
 
-    # Set the new password and commit
-    current_user.set_password(new_password)
-    db.session.commit()
-
-    flash('Password updated successfully!', 'success')
-    return redirect(url_for('auth.profile'))
+    return render_template('update_password.html')
