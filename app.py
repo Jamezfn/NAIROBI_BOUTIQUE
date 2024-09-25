@@ -28,6 +28,8 @@ def create_app(config_name=None):
     migrate.init_app(app, db)
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'Please log in to access this page.'
+    login_manager.login_message_category = 'warning'
 
     with app.app_context():
         from models.user import User
