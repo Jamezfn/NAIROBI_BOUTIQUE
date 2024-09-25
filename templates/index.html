@@ -1,11 +1,15 @@
+<!-- templates/index.html -->
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nairobi Boutique Hub</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Responsive Meta Tag -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <!-- Bootstrap CSS (Using Bootstrap 5.3.0 for consistency) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <style>
@@ -42,6 +46,8 @@
 
         .card-img-top {
             border-bottom: 1px solid #e5e5e5;
+            height: 200px;
+            object-fit: cover;
         }
 
         footer {
@@ -63,33 +69,36 @@
         }
     </style>
 </head>
+
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">Nairobi Boutique Hub</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" href="{{ url_for('home') }}">Nairobi Boutique Hub</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <!-- Show different links based on authentication status -->
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
                     {% if current_user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('auth.profile') }}">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <form action="{{ url_for('auth.logout') }}" method="POST" class="form-inline">
-                            <button type="submit" class="btn btn-link nav-link" style="padding: 0; border: none; background: none;">Logout</button>
+                        <form action="{{ url_for('auth.logout') }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-link nav-link p-0 m-0 align-baseline">Logout</button>
                         </form>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('boutiques.create_boutique') }}">Create Boutique</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth.register') }}">Signup</a>
+                        <a class="nav-link" href="{{ url_for('auth.register') }}">Sign Up</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -104,9 +113,7 @@
                 {% for category, message in messages %}
                     <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
                         {{ message }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 {% endfor %}
             {% endif %}
@@ -131,7 +138,8 @@
                 <div class="col-md-4">
                     <div class="card mb-4">
                         <img src="{{ boutique.image_url or url_for('static', filename='images/default.jpg') }}" 
-                             class="card-img-top" alt="{{ boutique.name }}">
+                             class="card-img-top" 
+                             alt="{{ boutique.name }}">
                         <div class="card-body">
                             <h4 class="card-title">{{ boutique.name }}</h4>
                             <p class="card-text">{{ boutique.description }}</p>
@@ -148,14 +156,16 @@
 
     <!-- Footer -->
     <footer class="bg-light text-center py-4">
-        <p>&copy; 2024 Nairobi Boutique Hub</p>
+        <div class="container">
+            <p>&copy; 2024 Nairobi Boutique Hub. All Rights Reserved.</p>
+        </div>
     </footer>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Bootstrap JS Bundle with Popper (Using Bootstrap 5) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Optional JavaScript -->
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
+
 </html>
 
